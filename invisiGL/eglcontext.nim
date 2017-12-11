@@ -6,7 +6,7 @@ type
         display: EGLDisplay
         context: EGLContext
 
-proc inglInit*(majorVer: int32, minorVer: int32): inglContextObj {.raises: [inglContextError].} =
+proc inglInit*(majorVer: int32, minorVer: int32, isDebug: bool): inglContextObj {.raises: [inglContextError].} =
     var display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if display == EGL_NO_DISPLAY:
         raise newCntxtErr "Failed to eglGetDisplay(EGL_DEFAULT_DISPLAY)"
@@ -52,13 +52,14 @@ proc inglInit*(majorVer: int32, minorVer: int32): inglContextObj {.raises: [ingl
         raise newCntxtErr "Failed to eglBindAPI(EGL_OPENGL_API)"
 
     const EGL_CONTEXT_FLAGS_KHR: EGLint  = 0x30FC
+    const EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR: EGLint              = 0x00000001
     const EGL_CONTEXT_OPENGL_FORWARD_COMPATIBLE_BIT_KHR: EGLint = 0x00000002
 
     var context_attrib = [
         cast[EGLint](EGL_CONTEXT_MAJOR_VERSION),          majorVer,
         EGL_CONTEXT_MINOR_VERSION,          minorVer,
         EGL_CONTEXT_OPENGL_PROFILE_MASK,    EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
-        EGL_CONTEXT_FLAGS_KHR,              EGL_CONTEXT_OPENGL_FORWARD_COMPATIBLE_BIT_KHR,
+        EGL_CONTEXT_FLAGS_KHR,              EGL_CONTEXT_OPENGL_FORWARD_COMPATIBLE_BIT_KHR or (if isDebug: EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR else: 0),
         EGL_NONE
     ]
 

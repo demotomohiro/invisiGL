@@ -6,7 +6,7 @@ type
         hdc:    HDC
         hglrc:  HGLRC
 
-proc inglInit*(majorVer: int32, minorVer: int32): inglContextObj {.raises: [inglContextError].} =
+proc inglInit*(majorVer: int32, minorVer: int32, isDebug: bool): inglContextObj {.raises: [inglContextError].} =
     var hWnd = CreateWindowEx(WS_EX_APPWINDOW, "STATIC", "", WS_POPUP, 0, 0, 640, 480, 0, 0, GetModuleHandle(nil), nil)
     if hWnd == 0:
         raise newCntxtErr "Failed to CreateWindowEx"
@@ -64,14 +64,14 @@ proc inglInit*(majorVer: int32, minorVer: int32): inglContextObj {.raises: [ingl
     const WGL_CONTEXT_FLAGS_ARB         = 0x2094i32
     const WGL_CONTEXT_PROFILE_MASK_ARB  = 0x9126i32
 
-#    const WGL_CONTEXT_DEBUG_BIT_ARB              = 0x0001i32
+    const WGL_CONTEXT_DEBUG_BIT_ARB              = 0x0001i32
     const WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB = 0x0002i32
     const WGL_CONTEXT_CORE_PROFILE_BIT_ARB       = 0x00000001i32
 
     var attribList = [
         WGL_CONTEXT_MAJOR_VERSION_ARB,   majorVer,
         WGL_CONTEXT_MINOR_VERSION_ARB,   minorVer,
-        WGL_CONTEXT_FLAGS_ARB,           WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+        WGL_CONTEXT_FLAGS_ARB,           WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB or (if isDebug: WGL_CONTEXT_DEBUG_BIT_ARB else: 0),
         WGL_CONTEXT_PROFILE_MASK_ARB,    WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
         0]
 

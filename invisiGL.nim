@@ -13,8 +13,8 @@ else:
 
 var defaultContext: inglContextObj
 
-proc inglInitAuto*(majorVer: int32, minorVer: int32) {.raises: [inglContextError].} =
-    defaultContext = inglInit(majorVer, minorVer)
+proc inglInitAuto*(majorVer: int32, minorVer: int32, isDebug: bool = false) {.raises: [inglContextError].} =
+    defaultContext = inglInit(majorVer, minorVer, isDebug)
     defaultContext.inglMakeCurrent
 
 proc inglCleanup*() =
