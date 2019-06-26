@@ -5,9 +5,9 @@ proc newCntxtErr(message: string): ref inglContextError =
     return newException(inglContextError, message)
 
 when hostOS == "windows":
-    include invisiGL/wglcontext
+    include invisiGL/private/wglcontext
 elif hostOS == "linux":
-    include invisiGL/eglcontext
+    include invisiGL/private/eglcontext
 else:
     {.error: "Unsupported OS".}
 
