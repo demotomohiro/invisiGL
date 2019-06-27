@@ -1,4 +1,5 @@
-import oldwinapi.windows
+import winim/winstr
+import winim/inc/[windef, winbase, winuser, wingdi]
 
 type
     inglContextObj* = object
@@ -7,7 +8,7 @@ type
         hglrc:  HGLRC
 
 proc inglInit*(majorVer: int32, minorVer: int32, isDebug: bool): inglContextObj {.raises: [inglContextError].} =
-    var hWnd = CreateWindowEx(WS_EX_APPWINDOW, "STATIC", "", WS_POPUP, 0, 0, 640, 480, 0, 0, GetModuleHandle(nil), nil)
+    var hWnd = CreateWindowEx(WS_EX_APPWINDOW, T"STATIC", "", WS_POPUP, 0, 0, 640, 480, 0, 0, GetModuleHandle(nil), nil)
     if hWnd == 0:
         raise newCntxtErr "Failed to CreateWindowEx"
     defer:
@@ -23,7 +24,7 @@ proc inglInit*(majorVer: int32, minorVer: int32, isDebug: bool): inglContextObj 
             discard ReleaseDC(hWnd, hdc)
 
     var pfd = PIXELFORMATDESCRIPTOR(
-        nSize:      int16(sizeof(PIXELFORMATDESCRIPTOR)),
+        nSize:      uint16(sizeof(PIXELFORMATDESCRIPTOR)),
         nVersion:   1,
         dwFlags:    cast[int32](PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER_DONTCARE or PFD_STEREO_DONTCARE),
         iPixelType: PFD_TYPE_RGBA,
@@ -51,13 +52,8 @@ proc inglInit*(majorVer: int32, minorVer: int32, isDebug: bool): inglContextObj 
         PFNwglCreateContextAttribsARB = proc (hDC: HDC, hShareContext: HGLRC, attribList: ptr int32): HGLRC {.stdcall.}
     let wglCreateContextAttribsARB = cast[PFNwglCreateContextAttribsARB](wglGetProcAddress("wglCreateContextAttribsARB"))
 
-    try:
-        if wglCreateContextAttribsARB == nil:
-            raise newCntxtErr "wglCreateContextAttribsARB is not available"
-    except inglContextError:
-        raise
-    except Exception:
-        assert(false, "unexpected exception")
+    if wglCreateContextAttribsARB == nil:
+        raise newCntxtErr "wglCreateContextAttribsARB is not available"
 
     const WGL_CONTEXT_MAJOR_VERSION_ARB = 0x2091i32
     const WGL_CONTEXT_MINOR_VERSION_ARB = 0x2092i32

@@ -10,7 +10,7 @@ srcDir        = "src"
 
 requires "nim >= 0.17.2"
 when hostOS == "windows":
-    requires "oldwinapi"
+    requires "winim"
 elif hostOS == "linux":
     requires "egl"
 
